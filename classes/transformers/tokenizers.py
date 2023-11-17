@@ -36,6 +36,7 @@ and Twitter is cooperating, then it should tokenize a random
 English-language tweet.
 """
 
+
 __author__ = "Christopher Potts"
 __copyright__ = "Copyright 2011, Christopher Potts"
 __credits__ = []
@@ -123,8 +124,10 @@ regex_strings = (
 
 ######################################################################
 # This is the core tokenizing regex:
-    
-word_re = re.compile(r"""(%s)""" % "|".join(regex_strings), re.VERBOSE | re.I | re.UNICODE)
+
+word_re = re.compile(
+    f"""({"|".join(regex_strings)})""", re.VERBOSE | re.I | re.UNICODE
+)
 
 # The emoticon string gets its own regex so that we can preserve case for them as needed:
 emoticon_re = re.compile(regex_strings[1], re.VERBOSE | re.I | re.UNICODE)
@@ -186,7 +189,7 @@ class PottsTokenizer(object):
         """
         # First the digits:
         ents = set(html_entity_digit_re.findall(s))
-        if len(ents) > 0:
+        if ents:
             for ent in ents:
                 entnum = ent[2:-1]
                 try:
@@ -225,7 +228,7 @@ class MyPottsTokenizer(PottsTokenizer):
         if isinstance(s, str):
             return super(MyPottsTokenizer, self).tokenize(s)
         else:
-            raise TypeError, "Tokenizer got %s, expected str" % type(s)
+            raise (TypeError, f"Tokenizer got {type(s)}, expected str")
 
 if __name__ == '__main__':
     tok = Tokenizer(preserve_case=False)
@@ -291,7 +294,7 @@ class NegationSuffixAdder():
         # negation tokenization
         neg_tokens = []
         append_neg = False # stores whether to add "_NEG"
-        
+
         for token in tokens:
             
             # if we see clause-level punctuation, 
@@ -302,10 +305,10 @@ class NegationSuffixAdder():
             # Do or do not append suffix, depending
             # on state of 'append_neg'
             if append_neg: 
-                neg_tokens.append(token + "_NEG")
+                neg_tokens.append(f"{token}_NEG")
             else:
                 neg_tokens.append(token)    
-            
+
             # if we see negation word, 
             # start appending suffix
             if self.NEGATION_RE.match(token):

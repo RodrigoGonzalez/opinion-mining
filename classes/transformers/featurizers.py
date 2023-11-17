@@ -116,10 +116,7 @@ class SubjFeaturizer(BaseFeaturizer):
 
 		for wrd, pos in sent.lemmatized: 
 
-			info = self.get_from_lexicon(wrd, pos)
-
-			if info: 
-
+			if info := self.get_from_lexicon(wrd, pos):
 				subj_type = info['type']
 				polarity = info['priorpolarity']
 
@@ -128,17 +125,11 @@ class SubjFeaturizer(BaseFeaturizer):
 				elif subj_type=='weaksubj':
 					n_weaksubj += 1
 
-				# if polarity=='negative':
-				# 	n_negative +=1
-				# elif polarity=='positive':
-				# 	n_positive +=1
-
-		features = {}
-		features['frac_strongsubj'] = n_strongsubj / n_wrds
-		features['frac_weaksubj'] = n_weaksubj / n_wrds
-		features['total_subj'] = n_strongsubj + n_weaksubj
-
-		return features
+		return {
+			'frac_strongsubj': n_strongsubj / n_wrds,
+			'frac_weaksubj': n_weaksubj / n_wrds,
+			'total_subj': n_strongsubj + n_weaksubj,
+		}
 
 	def get_from_lexicon(self, wrd, pos):
 		"""
@@ -195,8 +186,8 @@ class LiuFeaturizer(BaseFeaturizer):
 		Read in the lexicons. 
 		"""
 
-		pos_path = self.PATH_TO_LEXICONS + "/Liu/positive-words.txt"
-		neg_path = self.PATH_TO_LEXICONS + "/Liu/negative-words.txt"
+		pos_path = f"{self.PATH_TO_LEXICONS}/Liu/positive-words.txt"
+		neg_path = f"{self.PATH_TO_LEXICONS}/Liu/negative-words.txt"
 
 		self.pos_lex = self.read_lexicon(pos_path)
 		self.neg_lex = self.read_lexicon(neg_path)
@@ -272,9 +263,13 @@ class LiuFeaturizer(BaseFeaturizer):
 		frac_advbs = n_advbs / n_wrds
 
 		# binary variables for presence/absence of indicative POS tags
-		has_pronoun = 1 if any([tag in pronouns for tag in tags]) else 0
-		has_cardinal = 1 if any([tag in pronouns for tag in tags]) else 0 
-		has_modal = 1 if any([tag=='MD' and wrd!='will' for wrd, tag in sent.pos_tagged]) else 0
+		has_pronoun = 1 if any(tag in pronouns for tag in tags) else 0
+		has_cardinal = 1 if any(tag in pronouns for tag in tags) else 0
+		has_modal = (
+			1
+			if any(tag == 'MD' and wrd != 'will' for wrd, tag in sent.pos_tagged)
+			else 0
+		)
 
 		# return feature dict
 		return {'n_nouns': n_nouns,
@@ -318,20 +313,17 @@ class LiuFeaturizer(BaseFeaturizer):
 					num_neg+=1 
 				elif tok.strip("_NEG") in self.neg_lex:
 					num_pos+=1
-			
-			# otherwise, add to normal tally
-			else: 
-				if tok in self.pos_lex:
-					num_pos +=1
-				elif tok in self.neg_lex:
-					num_neg += 1
 
-		features = {}
-		features['raw'] = num_pos - num_neg		
-		features['frac_pos'] = num_pos / sent_len
-		features['frac_neg'] = num_neg / sent_len
+			elif tok in self.pos_lex:
+				num_pos +=1
+			elif tok in self.neg_lex:
+				num_neg += 1
 
-		return features
+		return {
+			'raw': num_pos - num_neg,
+			'frac_pos': num_pos / sent_len,
+			'frac_neg': num_neg / sent_len,
+		}
 
 
 

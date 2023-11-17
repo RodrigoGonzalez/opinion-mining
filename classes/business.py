@@ -223,7 +223,11 @@ class Business(object):
 		filter out "chicken" if "pesto chicken" is a multi-word aspect. 
 		"""
 
-		return [(sing_asp, count) for sing_asp, count in single_asps if not any([sing_asp in mult_asp for mult_asp, _ in multi_asps])]
+		return [
+			(sing_asp, count)
+			for sing_asp, count in single_asps
+			if all(sing_asp not in mult_asp for mult_asp, _ in multi_asps)
+		]
 
 	def filter_asp_dict(self, asp_dict, num_valid_threshold = 5):
 		"""

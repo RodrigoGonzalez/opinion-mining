@@ -129,8 +129,8 @@ class Sentence(object):
 		# re-tokenize the aspect
 		asp_toks = asp_string.split(" ")
 
-		# return true if all the aspect tokens are in this sentence 
-		return all([tok in self.tokenized for tok in asp_toks])
+		# return true if all the aspect tokens are in this sentence
+		return all(tok in self.tokenized for tok in asp_toks)
 
 	def encode(self):
 		"""

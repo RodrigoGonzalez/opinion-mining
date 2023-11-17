@@ -64,9 +64,12 @@ class SentenceAspectExtractor():
 
         no_stops = [w for w in aspect if w not in SentenceAspectExtractor.STOPWORDS and not self.PUNCT_RE.match(w)]
 
-        if len(no_stops) < 1: #
+        if not no_stops: #
             return False
-        elif any([forbid_wrd in aspect for forbid_wrd in SentenceAspectExtractor.FORBIDDEN]):
+        elif any(
+            forbid_wrd in aspect
+            for forbid_wrd in SentenceAspectExtractor.FORBIDDEN
+        ):
             return False
         else:
             return True

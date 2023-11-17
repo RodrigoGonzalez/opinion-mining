@@ -13,7 +13,7 @@ def index():
 @app.route('/dashboard')
 def dashboard():
 	# get list of business names/ids from mongo
-	businesses =[b for b in db.summaries.find()]
+	businesses = list(db.summaries.find())
 	return render_template('index.html.jinja', businesses = businesses)
 
 @app.route('/summaries/<b_id>')

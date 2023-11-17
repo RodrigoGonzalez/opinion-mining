@@ -72,7 +72,7 @@ if __name__ == "__main__":
 		Function to clean up the categories column
 		in 'business' data frame for later use. 
 		"""
-		return "<CAT>".join([c for c in cat])
+		return "<CAT>".join(list(cat))
 
 	restaurant_df['business_categories'] = restaurant_df.categories.apply(clean_categories)
 	del restaurant_df['categories']
